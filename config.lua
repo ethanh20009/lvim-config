@@ -32,8 +32,20 @@ lvim.plugins = {
     lazy = false,
     opts = {},
   },
-  { 'projekt0n/github-nvim-theme',            lazy = false },
-  { "nvim-treesitter/nvim-treesitter-angular" }
+  { 'projekt0n/github-nvim-theme',     lazy = false },
+  { "nvim-treesitter/nvim-treesitter", commit = "fbe7621" },
+}
+
+local formatters = require "lvim.lsp.null-ls.formatters"
+formatters.setup {
+  {
+    name = "prettier",
+    ---@usage arguments to pass to the formatter
+    -- these cannot contain whitespace
+    -- options such as `--line-width 80` become either `{"--line-width", "80"}` or `{"--line-width=80"}`
+    ---@usage only start in these filetypes, by default it will attach to all filetypes it supports
+    filetypes = { "angular.html", "typescript", "typescriptreact", "html", "scss", "json" },
+  },
 }
 
 -- Custom config
@@ -41,8 +53,23 @@ lvim.colorscheme = "catppuccin"
 lvim.format_on_save.enabled = true
 lvim.builtin.treesitter.highlight.enable = true
 vim.wo.relativenumber = true
-require("lvim.lsp.manager").setup("angularls")
+require("lvim.lsp.manager").setup("angularls", {
+  filetypes = {
+    "angular.html",
+    "typescript",
+    "tsx",
+    "html",
+    "scss",
+    "css"
+  }
+})
 
+require("lvim.lsp.manager").setup("html", {
+  filetypes = {
+    "angular.html",
+    "html"
+  }
+})
 -- Custom which-key bindings
 local wk = require("which-key")
 wk.register({
@@ -53,4 +80,18 @@ wk.register({
   }
 }, {
   prefix = "<leader>"
+})
+
+--Angular custom treesitter
+vim.filetype.add({
+  pattern = {
+    [".*%.component%.html"] = "angular.html", -- Sets the filetype to `angular.html` if it matches the pattern
+  },
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "angular.html",
+  callback = function()
+    vim.treesitter.language.register("angular", "angular.html") -- Register the filetype with treesitter for the `angular` language/parser
+  end,
 })
