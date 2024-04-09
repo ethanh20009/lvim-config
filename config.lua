@@ -34,6 +34,40 @@ lvim.plugins = {
   },
   { 'projekt0n/github-nvim-theme',     lazy = false },
   { "nvim-treesitter/nvim-treesitter", commit = "fbe7621" },
+  {
+    "ray-x/lsp_signature.nvim",
+    event = "BufRead",
+    opts = {
+      floating_window = false,
+    },
+    config = function(_, opts) require "lsp_signature".setup(opts) end,
+  },
+  {
+    "windwp/nvim-ts-autotag",
+    config = function()
+      require("nvim-ts-autotag").setup({
+        filetypes = {
+          "angular.html", "html"
+        }
+      }
+      )
+    end,
+  },
+  {
+    "nvim-telescope/telescope-project.nvim",
+    event = "BufWinEnter",
+    config = function()
+      require 'telescope'.load_extension('project')
+    end
+  },
+  {
+    "tpope/vim-surround",
+
+    -- make sure to change the value of `timeoutlen` if it's not triggering correctly, see https://github.com/tpope/vim-surround/issues/117
+    -- setup = function()
+    --  vim.o.timeoutlen = 500
+    -- end
+  },
 }
 
 local formatters = require "lvim.lsp.null-ls.formatters"
@@ -77,6 +111,9 @@ wk.register({
     name = "Diff View",
     v = { "<cmd>DiffviewOpen<cr>", "Open Diff" },
     c = { "<cmd>DiffviewClose<cr>", "Close Diff" }
+  },
+  P = {
+    "<cmd>lua require'telescope'.extensions.project.project{}<cr>", "Projects"
   }
 }, {
   prefix = "<leader>"
